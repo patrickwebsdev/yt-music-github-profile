@@ -4,7 +4,7 @@ const axios = require('axios');
 const fs = require('fs').promises;
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
 
 let globalCache = {
   data: null,
@@ -60,8 +60,6 @@ async function getSVG(title = '', artist = '', song = '', image = '') {
   return template;
 }
 
-app.listen(port);
-
 app.get('/', async (req, res) => {
   try {
     let data;
@@ -96,3 +94,7 @@ app.get('/', async (req, res) => {
     });
   }
 })
+
+app.listen(port, () => console.log(`Server ready on port ${port}.`));
+
+module.exports = app;
