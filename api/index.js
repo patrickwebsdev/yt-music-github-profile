@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const fs = require('fs').promises;
+const path = require('path');
+
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -44,13 +46,13 @@ async function getImageB64(url) {
 async function getSVG(title = '', artist = '', song = '', image = '') {
   let template;
   if (artist === '' && song === '') {
-    template = await fs.readFile('./template-player-nothing.tpl', 'utf-8');
+    template = await fs.readFile(path.join(process.cwd(), 'public', 'template-player-nothing.tpl'), 'utf-8');
   }
   else if (image !== null) {
-    template = await fs.readFile('./template-player-image.tpl', 'utf-8');
+    template = await fs.readFile(path.join(process.cwd(), 'public', 'template-player-image.tpl'), 'utf-8');
   }
   else if (image === null) {
-    template = await fs.readFile('./template-player.tpl', 'utf-8');
+    template = await fs.readFile(path.join(process.cwd(), 'public', 'template-player.tpl'), 'utf-8');
   }
   template = template
     .replace('{{title_text}}', title)
