@@ -60,7 +60,7 @@ async function getSVG(title = '', artist = '', song = '', image = '') {
   return template;
 }
 
-app.get('/svg/', async (req, res) => {
+app.get('/', async (req, res) => {
   try {
     let data;
     if (globalCache.data && (Date.now() - globalCache.timestamp) < 60000) {
