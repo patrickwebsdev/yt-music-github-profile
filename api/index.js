@@ -70,7 +70,7 @@ async function getSVG(title = '', artist = '', song = '', image = '', color = '#
 app.get('/', async (req, res) => {
   try {
     let data;
-    if (globalCache.data && (Date.now() - globalCache.timestamp) < 600000) {
+    if (globalCache.data && (Date.now() - globalCache.timestamp) < 5000) {
       data = globalCache.data;
       console.log('Usando datos del caché global');
     } else {
