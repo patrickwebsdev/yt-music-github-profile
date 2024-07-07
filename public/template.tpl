@@ -98,9 +98,12 @@
         font-weight: bold;
         font-size: 1.25rem;
         padding-bottom: 0.5rem;
+        padding-right: 1.25rem;
+        display: inline-block;
       }
 
-      .song-container {
+      .song-container,
+      .artist-container {
         overflow: hidden;
         white-space: nowrap;
         margin-right: 1rem;
@@ -172,7 +175,8 @@
         display: none;
       }
 
-      .song-animate .song {
+      .song-animate .song,
+      .artist-animate .artist {
         animation: song 10s infinite linear;
       }
 
