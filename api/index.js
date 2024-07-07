@@ -3,6 +3,7 @@ const express = require('express');
 const axios = require('axios');
 const fs = require('fs').promises;
 const path = require('path');
+const Vibrant = require('node-vibrant');
 
 
 const app = express();
@@ -31,41 +32,45 @@ async function getLastFmData() {
   return response.data;
 }
 
-async function getImageB64(url) {
+async function getImageB64AndColor(url) {
   try {
     const response = await axios.get(url, { responseType: 'arraybuffer' });
     const buffer = Buffer.from(response.data, 'binary');
-    const base64 = buffer.toString('base64');
-    return `${base64}`;
-  }
-  catch (error) {
-    return null;
+    const thumbnail = buffer.toString('base64');
+    const vibrant = await Vibrant.from(buffer)
+      .quality(100).getPalette();
+    const { hex: color } = vibrant.Vibrant;
+    return { thumbnail, color };
+  } catch (error) {
+    console.error('Error:', error);
+    return { thumbnail: null, color: "#121212" };
   }
 }
-
-async function getSVG(title = '', artist = '', song = '', image = '') {
+async function getSVG(title = '', artist = '', song = '', image = '', color = '#121212') {
   let template;
   if (artist === '' && song === '') {
     template = await fs.readFile(path.join(process.cwd(), 'public', 'template-player-nothing.tpl'), 'utf-8');
   }
   else if (image !== null) {
-    template = await fs.readFile(path.join(process.cwd(), 'public', 'template-player-image.tpl'), 'utf-8');
+    template = await fs.readFile(path.join(process.cwd(), 'public', 'template-player-image-gradient.tpl'), 'utf-8');
   }
   else if (image === null) {
     template = await fs.readFile(path.join(process.cwd(), 'public', 'template-player.tpl'), 'utf-8');
   }
   template = template
-    .replace('{{title_text}}', title)
-    .replace('{{artist_name}}', escapeXml(artist))
-    .replace('{{song_name}}', escapeXml(song))
-    .replace('{{img}}', image);
+    .replaceAll('{{title_text}}', title)
+    .replaceAll('{{artist_name}}', escapeXml(artist))
+    .replaceAll('{{song_name}}', escapeXml(song))
+    .replaceAll('{{img}}', image)
+    .replaceAll('{{gradient}}', color)
+    .replaceAll('{{song_animate}}', song.length > 25 ? " song-animate" : "");
   return template;
 }
 
 app.get('/', async (req, res) => {
   try {
     let data;
-    if (globalCache.data && (Date.now() - globalCache.timestamp) < 60000) {
+    if (globalCache.data && (Date.now() - globalCache.timestamp) < 600000) {
       data = globalCache.data;
       console.log('Usando datos del caché global');
     } else {
@@ -81,11 +86,12 @@ app.get('/', async (req, res) => {
       const title = track['@attr'] && track['@attr'].nowplaying === 'true' ? 'Now playing' : 'Recently played'
       const artist = track.artist['#text'];
       const song = track.name;
-      const thumbnail = await getImageB64(track.image.find(img => img.size === 'extralarge')['#text'] || null);
+      const { thumbnail, color } = await getImageB64AndColor(track.image.find(img => img.size === 'extralarge')['#text'] || null);
       res.set('Content-Type', 'image/svg+xml');
-      return res.send(await getSVG(title, artist, song, thumbnail));
+      return res.send(await getSVG(title, artist, song, thumbnail, color));
     }
     else {
+      song_animate
       res.set('Content-Type', 'image/svg+xml');
       return res.send(await getSVG());
     }
