@@ -2,7 +2,7 @@
   <defs>
     <linearGradient id="gradient1" gradientTransform="rotate(21)">
       <stop offset="0%" stop-color="{{gradient}}"></stop>
-      <stop offset="65%" stop-color="#121212"></stop>
+      <stop offset="65%" stop-color="#020202"></stop>
     </linearGradient>
   </defs>
   <rect width="100%" height="100%" rx="5" fill="url(#gradient1)"></rect>

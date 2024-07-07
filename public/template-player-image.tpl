@@ -6,7 +6,7 @@
         }
 
         .container {
-          background-color: #121212;
+          background-color: #020202;
           border-radius: 5px;
           padding: 10px 10px;
           display: flex;
