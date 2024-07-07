@@ -33,6 +33,12 @@ async function getLastFmData() {
 }
 
 async function getImageB64AndColor(url) {
+  if (url === null || url === "") {
+    return {
+      thumbnail: null,
+      color: "#FF0000"
+    }
+  }
   try {
     const response = await axios.get(url, { responseType: 'arraybuffer' });
     const buffer = Buffer.from(response.data, 'binary');
@@ -46,24 +52,17 @@ async function getImageB64AndColor(url) {
     return { thumbnail: null, color: "#121212" };
   }
 }
-async function getSVG(title = '', artist = '', song = '', image = '', color = '#121212') {
-  let template;
-  if (artist === '' && song === '') {
-    template = await fs.readFile(path.join(process.cwd(), 'public', 'template-player-nothing.tpl'), 'utf-8');
-  }
-  else if (image !== null) {
-    template = await fs.readFile(path.join(process.cwd(), 'public', 'template-player-image-gradient.tpl'), 'utf-8');
-  }
-  else if (image === null) {
-    template = await fs.readFile(path.join(process.cwd(), 'public', 'template-player.tpl'), 'utf-8');
-  }
+async function getSVG(title = '', artist = '', song = '', image = '', color = '#FF0000') {
+  let template = await fs.readFile(path.join(process.cwd(), 'public', 'template.tpl'), 'utf-8');
   template = template
-    .replaceAll('{{title_text}}', title)
+    .replaceAll('{{title_text}}', title === "" ? "Nothing plays" : title)
     .replaceAll('{{artist_name}}', escapeXml(artist))
     .replaceAll('{{song_name}}', escapeXml(song))
-    .replaceAll('{{img}}', image)
+    .replaceAll('{{img}}', image === null ? "" : image)
     .replaceAll('{{gradient}}', color)
-    .replaceAll('{{song_animate}}', song.length > 25 ? " song-animate" : "");
+    .replaceAll('{{song_animate}}', song.length > 25 ? " song-animate" : "")
+    .replaceAll('{{artist_animate}}', artist.length > 25 ? " artist-animate" : "")
+    .replaceAll('{{cover_type}}', image === null || image === "" ? " bars" : " image");
   return template;
 }
 
@@ -91,7 +90,6 @@ app.get('/', async (req, res) => {
       return res.send(await getSVG(title, artist, song, thumbnail, color));
     }
     else {
-      song_animate
       res.set('Content-Type', 'image/svg+xml');
       return res.send(await getSVG());
     }
