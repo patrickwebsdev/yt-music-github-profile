@@ -61,7 +61,7 @@ async function getSVG(title = '', artist = '', song = '', image = '', color = '#
     .replaceAll('{{img}}', image === null ? "" : image)
     .replaceAll('{{gradient}}', color)
     .replaceAll('{{song_animate}}', song.length > 25 ? " song-animate" : "")
-    .replaceAll('{{artist_animate}}', artist.length > 25 ? " artist-animate" : "")
+    .replaceAll('{{artist_animate}}', artist.length > 20 ? " artist-animate" : "")
     .replaceAll('{{cover_type}}', image === null || image === "" ? " bars" : " image");
   return template;
 }
